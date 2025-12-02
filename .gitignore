@@ -1,13 +1,28 @@
-# Ignore Python virtual environment
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+terraform.tfvars
+terraform.tfvars.json
+
+# Ansible
+*.retry
+
+# Python / venv
+__pycache__/
+*.pyc
 ansible_venv/
 
-# Ignore Terraform sensitive/state files
-*.tfstate
-*.tfstate.backup
-terraform.tfvars
-
-# Ignore service account keys
+# Credentials / keys (ne jamais pousser)
 tf-admin.json
+*.pem
+*.key
+*.p12
 
-# Ignore Python cache
-__pycache__/
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+
