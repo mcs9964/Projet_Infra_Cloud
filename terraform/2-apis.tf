@@ -4,7 +4,7 @@ resource "google_project_service" "compute" { // ca c'est l'API pour créer des 
 
   disable_on_destroy = false
 }
-
+/*
 resource "google_project_service" "container" { // in case on utilise Kubernetes
   project = local.project_id
   service = "container.googleapis.com"
@@ -25,3 +25,4 @@ resource "google_project_service" "secretmanager" { // pour utiliser le Secret M
 
   disable_on_destroy = false
 }
+*/

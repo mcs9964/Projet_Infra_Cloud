@@ -7,8 +7,8 @@ resource "google_compute_network" "vpc" {
   depends_on = [google_project_service.compute]
 }
 
-resource "google_compute_route" "default_route" { // Route par défaut vers Internet pour NAT getaway et pour créer des subnets privés
-  name       = "default_route"
+resource "google_compute_route" "defaultroute" { // Route par défaut vers Internet pour NAT getaway et pour créer des subnets privés
+  name       = "defaultroute"
   dest_range = "0.0.0.0/0"
   network    = google_compute_network.vpc.name
   next_hop_gateway = "default-internet-gateway"

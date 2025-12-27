@@ -28,8 +28,12 @@ resource "google_compute_router_nat" "nat" {
   depends_on = [google_compute_router.router]
 
   subnetwork {
-    name                    = google_compute_subnetwork.private.id // On configure la NAT getaway pour le subnet privé, le subnet "public" avec l'edge
-    //node n'en a pas besoin car il a une IP externe
+    name                    = google_compute_subnetwork.private.id 
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
+
+  subnetwork {
+    name                    = google_compute_subnetwork.public.id 
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 }
