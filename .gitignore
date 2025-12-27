@@ -2,10 +2,19 @@
 .terraform/
 *.tfstate
 *.tfstate.*
+.terraform.lock.hcl
+*.tflock
+*.lock.hcl
+*.tfstate.lock.info
 crash.log
 override.tf
 terraform.tfvars
 terraform.tfvars.json
+
+# Downloads / installers
+google-chrome-stable*
+googlechrome-stable*
+google-chrome-*.deb
 
 # Ansible
 *.retry
@@ -25,4 +34,5 @@ tf-admin.json
 .DS_Store
 Thumbs.db
 .vscode/
+
 
