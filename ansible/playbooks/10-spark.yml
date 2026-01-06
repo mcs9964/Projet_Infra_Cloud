@@ -1,0 +1,49 @@
+- name: Install Spark on all nodes
+  hosts: spark
+  become: yes
+  vars:
+    spark_version: "3.5.1"
+    hadoop_profile: "3"
+    spark_tgz: "spark-{{ spark_version }}-bin-hadoop{{ hadoop_profile }}.tgz"
+    spark_url: "https://archive.apache.org/dist/spark/spark-{{ spark_version }}/{{ spark_tgz }}"
+    spark_install_dir: "/opt"
+    spark_home: "/opt/spark"
+  tasks:
+    - name: Download Spark
+      get_url:
+        url: "{{ spark_url }}"
+        dest: "/tmp/{{ spark_tgz }}"
+        mode: "0644"
+
+    - name: Extract Spark
+      unarchive:
+        src: "/tmp/{{ spark_tgz }}"
+        dest: "{{ spark_install_dir }}"
+        remote_src: yes
+
+    - name: Symlink /opt/spark
+      file:
+        src: "{{ spark_install_dir }}/spark-{{ spark_version }}-bin-hadoop{{ hadoop_profile }}"
+        dest: "{{ spark_home }}"
+        state: link
+        force: yes
+
+    - name: Set SPARK_HOME globally
+      copy:
+        dest: /etc/profile.d/spark.sh
+        mode: "0644"
+        content: |
+          export SPARK_HOME={{ spark_home }}
+          export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+- name: Configure workers list on master
+  hosts: master
+  become: yes
+  tasks:
+    - name: Create workers file
+      copy:
+        dest: /opt/spark/conf/workers
+        mode: "0644"
+        content: |
+          slave-1
+          slave-2

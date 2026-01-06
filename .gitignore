@@ -36,3 +36,11 @@ Thumbs.db
 .vscode/
 
 
+# SSH (ne jamais versionner)
+.ssh/
+id_ed25519*
+gcp_ansible*
+
+# gcloud credentials
+.config/gcloud/
+
