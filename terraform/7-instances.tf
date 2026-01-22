@@ -12,6 +12,12 @@ resource "google_compute_instance" "edge" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      metadata["ssh-keys"]
+    ]
+  }
+
   network_interface {
     subnetwork = google_compute_subnetwork.public.id
   }

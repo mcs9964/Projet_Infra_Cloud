@@ -1,0 +1,18 @@
+hamza@edge:~/Projet_Infra_Cloud/ansible/playbooks$ ansible-playbook -i ../inventory/inventory.ini 10-spark.yml 
+
+source /etc/profile.d/spark.sh
+spark-submit --version
+
+
+Copier le fichier sur slave-1 et slave-2 au même chemin :
+scp filesample.txt hamza@10.0.32.7:/tmp/filesample.txt
+scp filesample.txt hamza@10.0.32.6:/tmp/filesample.txt
+
+
+lancer le job :
+spark-submit \
+  --class WordCount \
+  --master spark://10.0.32.5:7077 \
+  wc.jar \
+  file:///tmp/filesample.txt \
+  /tmp/wc-output-1

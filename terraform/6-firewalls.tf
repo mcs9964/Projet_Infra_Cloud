@@ -18,11 +18,24 @@ resource "google_compute_firewall" "allow_ssh_internal_ansible" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports    = ["0-65535"] //port pour spark
   }
 
-  source_tags = ["ansible"] //ici on utilise source tag et pas source rages car à chaque lancer de terraform
+  source_tags = ["ansible", "spark"] //ici on utilise source tag et pas source rages car à chaque lancer de terraform
   //l'edge node peut avoir une IP interne différente, donc on tag l'edge node avec ansible pour le reconnaitre
   //peut importe son IP interne
   target_tags = ["spark"]
+}
+
+resource "google_compute_firewall" "allow_spark_to_edge" {
+  name    = "allow-spark-to-edge"
+  network = google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  source_tags = ["spark"]
+  target_tags = ["ansible"]
 }
