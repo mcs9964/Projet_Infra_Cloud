@@ -9,10 +9,42 @@ scp filesample.txt hamza@10.0.32.7:/tmp/filesample.txt
 scp filesample.txt hamza@10.0.32.6:/tmp/filesample.txt
 
 
-lancer le job :
+
+Lancer en local sur l'edge pour vérifier :
+  spark-submit \
+  --class WordCount \
+  --master local[*] \
+  wc.jar \
+  file:///tmp/filesample.txt \
+  /tmp/wc-output-local
+
+  rm -rf /tmp/wc-output-1 ( sinon spark refuse d'écrire dessus si il existe déjà )
+
+
+regarder les workers depuis pc personel : 
+
+gcloud compute ssh edge \
+  --zone us-central1-a \
+  --project projet-cloud-n7 \
+  --tunnel-through-iap \
+  -- -L 8080:10.0.32.5:8080
+
+ouvrir depuis pc perso : http://localhost:8080
+
+
+submit bucket :
 spark-submit \
   --class WordCount \
   --master spark://10.0.32.5:7077 \
+  --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.19 \
+  --conf spark.driver.userClassPathFirst=true \
+  --conf spark.executor.userClassPathFirst=true \
+  --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+  --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
   wc.jar \
-  file:///tmp/filesample.txt \
-  /tmp/wc-output-1
+  gs://projet-cloud-n7-spark/filesample.txt \
+  gs://projet-cloud-n7-spark/wc-output-1
+
+
+
+
