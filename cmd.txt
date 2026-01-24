@@ -1,15 +1,3 @@
-hamza@edge:~/Projet_Infra_Cloud/ansible/playbooks$ ansible-playbook -i ../inventory/inventory.ini 10-spark.yml 
-
-source /etc/profile.d/spark.sh
-spark-submit --version
-
-
-Copier le fichier sur slave-1 et slave-2 au même chemin :
-scp filesample.txt hamza@10.0.32.7:/tmp/filesample.txt
-scp filesample.txt hamza@10.0.32.6:/tmp/filesample.txt
-
-
-
 Lancer en local sur l'edge pour vérifier :
   spark-submit \
   --class WordCount \
@@ -18,9 +6,8 @@ Lancer en local sur l'edge pour vérifier :
   file:///tmp/filesample.txt \
   /tmp/wc-output-local
 
-  puis :  cat /tmp/wc-output-local/part*
-
-  rm -rf /tmp/wc-output-1 ( sinon spark refuse d'écrire dessus si il existe déjà )
+puis :  cat /tmp/wc-output-local/part*
+rm -rf /tmp/wc-output-1 ( sinon spark refuse d'écrire dessus si il existe déjà )
 
 
 regarder les workers depuis pc personel : 
@@ -46,14 +33,66 @@ spark-submit \
   --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
   wc.jar \
   gs://projet-cloud-n7-spark/filesample.txt \
-  gs://projet-cloud-n7-spark/wc-output-1
+  gs://projet-cloud-n7-spark/wc-output-2
+
+submit job : 
+/usr/bin/time -p spark-submit \
+  --class WordCount \
+  --master spark://10.0.32.5:7077 \
+  --conf spark.cores.max=2 \
+  --executor-cores 1 \
+  --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.19 \
+  --jars /home/hamza/.ivy2/jars/com.google.guava_guava-32.1.2-jre.jar \
+  --conf spark.driver.userClassPathFirst=true \
+  --conf spark.executor.userClassPathFirst=true \
+  --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+  --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+  wc.jar \
+  gs://projet-cloud-n7-spark/filesample.txt \
+  gs://projet-cloud-n7-spark/wc-output-1exec1core
+
+file size : 547 Mo
+T1 : --num-executors 1 --executor-cores 1 (1 cœur) 66.96s real / spark 53s
+--conf spark.cores.max=1
+--executor-cores 1
+
+T2 : --num-executors 2 --executor-cores 1 (2 cœurs) 49.24s real / spark 35 s
+--conf spark.cores.max=2
+--executor-cores 1
 
 
+T3 : --num-executors 4 --executor-cores 1 (4 cœurs) : 60.49 s real / spark 47s
+--conf spark.cores.max=4
+--executor-cores 1
 
 
-  supprimer au cas ou déjà existant : rm -rf /tmp/wc-output-1 
+T4 (comparaison intéressante) : --num-executors 2 --executor-cores 2 (4 cœurs aussi):  46.96s real / spark 33s
+--conf spark.cores.max=4
+--executor-cores 2
 
-  voir l'output : 
+
+Conclusion immédiate : plus de cœurs ≠ toujours plus rapide, et la manière de les organiser (executors/cores) compte.
+
+
+supprimer au cas ou déjà existant : rm -rf /tmp/wc-output-1 
+
+voir l'output : 
+gsutil cat gs://projet-cloud-n7-spark/wc-output-2/part-*
+
+
+voir plateforme des slaves :
+# Worker 1
+gcloud compute ssh slave-1 --zone us-central1-a --tunnel-through-iap \
+  -- -L 18081:localhost:8081
+
+# Worker 2
+gcloud compute ssh slave-2 --zone us-central1-a --tunnel-through-iap \
+  -- -L 28081:localhost:8081
+
+worker1 UI → http://localhost:18081
+
+worker2 UI → http://localhost:28081
+
 
 
 
