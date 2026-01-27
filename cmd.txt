@@ -39,8 +39,8 @@ submit job :
 /usr/bin/time -p spark-submit \
   --class WordCount \
   --master spark://10.0.32.5:7077 \
-  --conf spark.cores.max=2 \
-  --executor-cores 1 \
+  --conf spark.cores.max=4 \
+  --executor-cores 2 \
   --packages com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.19 \
   --jars /home/hamza/.ivy2/jars/com.google.guava_guava-32.1.2-jre.jar \
   --conf spark.driver.userClassPathFirst=true \
@@ -49,7 +49,10 @@ submit job :
   --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
   wc.jar \
   gs://projet-cloud-n7-spark/filesample.txt \
-  gs://projet-cloud-n7-spark/wc-output-1exec1core
+  gs://projet-cloud-n7-spark/wc-output-demoborris
+
+  voir l'output : 
+gsutil cat gs://projet-cloud-n7-spark/wc-output-demoborris/part-*
 
 file size : 547 Mo
 T1 : --num-executors 1 --executor-cores 1 (1 cœur) 66.96s real / spark 53s
